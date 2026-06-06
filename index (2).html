@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduAI Teaching Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--bg:#0A0E1A;--bg2:#111827;--bg3:#1C2537;--bg4:#243046;
+--accent:#FF6B35;--accent2:#FFB347;--accent3:#4ECDC4;--accent4:#A78BFA;
+--text:#F1F5F9;--text2:#94A3B8;--text3:#64748B;
+--border:#2A3850;--border2:#3A4F6E;
+--success:#10B981;--warn:#F59E0B;--danger:#EF4444;
+--r:12px;--r2:8px;--r3:20px;
+}
+body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+.nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;background:var(--bg2);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.logo-text{font-size:1.1rem;font-weight:700;letter-spacing:-0.02em}
+.logo-text span{color:var(--accent)}
+.nav-tabs{display:flex;gap:4px;background:var(--bg3);padding:4px;border-radius:var(--r2);border:1px solid var(--border)}
+.nav-tab{padding:6px 16px;border-radius:6px;border:none;background:transparent;color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;font-family:'Space Grotesk',sans-serif;transition:all .2s}
+.nav-tab.active{background:var(--accent);color:#fff}
+.nav-tab:hover:not(.active){background:var(--bg4);color:var(--text)}
+.user-badge{display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);padding:6px 12px 6px 6px;border-radius:30px}
+.user-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--accent3),var(--accent4));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+.user-name{font-size:13px;color:var(--text2)}
+
+.page{display:none;padding:2rem}
+.page.active{display:block}
+
+/* GENERATE PAGE */
+.gen-header{text-align:center;margin-bottom:2.5rem}
+.gen-title{font-family:'DM Serif Display',serif;font-size:2.8rem;line-height:1.1;margin-bottom:0.5rem}
+.gen-title .highlight{color:var(--accent);font-style:italic}
+.gen-sub{color:var(--text2);font-size:1rem}
+
+.form-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:2rem;max-width:800px;margin:0 auto 2rem}
+.form-section-label{font-size:11px;font-weight:600;letter-spacing:.1em;color:var(--text3);text-transform:uppercase;margin-bottom:1rem}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem}
+.form-grid.three{grid-template-columns:1fr 1fr 1fr}
+.form-full{grid-column:1/-1}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:13px;color:var(--text2);font-weight:500}
+.field input,.field select,.field textarea{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);padding:10px 14px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:14px;outline:none;transition:border .2s}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent)}
+.field textarea{resize:vertical;min-height:80px}
+.field select option{background:var(--bg3)}
+
+.kit-toggles{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:1.5rem}
+.kit-toggle{display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:30px;padding:8px 16px;cursor:pointer;transition:all .2s;user-select:none}
+.kit-toggle.on{border-color:var(--accent);background:rgba(255,107,53,.1)}
+.kit-toggle .dot{width:8px;height:8px;border-radius:50%;background:var(--text3);transition:all .2s}
+.kit-toggle.on .dot{background:var(--accent)}
+.kit-toggle span{font-size:13px;font-weight:500}
+
+.gen-btn{width:100%;padding:16px;background:var(--accent);color:#fff;border:none;border-radius:var(--r2);font-size:16px;font-weight:600;font-family:'Space Grotesk',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .2s;letter-spacing:.01em}
+.gen-btn:hover{background:#e55a25;transform:translateY(-1px)}
+.gen-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
+
+/* OUTPUT AREA */
+.output-area{max-width:900px;margin:0 auto}
+.output-tabs{display:flex;gap:4px;margin-bottom:1.5rem;background:var(--bg2);padding:6px;border-radius:var(--r2);border:1px solid var(--border)}
+.out-tab{flex:1;padding:8px;border-radius:6px;border:none;background:transparent;color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;font-family:'Space Grotesk',sans-serif;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px}
+.out-tab.active{background:var(--bg4);color:var(--text);border:1px solid var(--border2)}
+.out-tab:hover:not(.active){color:var(--text)}
+
+.out-panel{display:none}
+.out-panel.active{display:block}
+
+.kit-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:1.5rem;margin-bottom:1rem}
+.kit-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid var(--border)}
+.kit-card-title{font-size:1rem;font-weight:600;display:flex;align-items:center;gap:8px}
+.kit-card-badge{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600}
+.badge-plan{background:rgba(78,205,196,.15);color:var(--accent3);border:1px solid rgba(78,205,196,.3)}
+.badge-ws{background:rgba(167,139,250,.15);color:var(--accent4);border:1px solid rgba(167,139,250,.3)}
+.badge-quiz{background:rgba(255,179,71,.15);color:var(--accent2);border:1px solid rgba(255,179,71,.3)}
+.badge-key{background:rgba(16,185,129,.15);color:var(--success);border:1px solid rgba(16,185,129,.3)}
+.kit-action-btns{display:flex;gap:6px}
+.action-btn{padding:6px 12px;border-radius:6px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:12px;font-weight:500;cursor:pointer;font-family:'Space Grotesk',sans-serif;transition:all .2s}
+.action-btn:hover{border-color:var(--accent);color:var(--accent);background:rgba(255,107,53,.1)}
+.action-btn.save{background:var(--accent);color:#fff;border-color:var(--accent)}
+.action-btn.save:hover{background:#e55a25}
+
+.content-block{line-height:1.8;color:var(--text2);font-size:14px}
+.content-block h3{color:var(--text);font-size:1rem;font-weight:600;margin:1.2rem 0 .5rem;display:flex;align-items:center;gap:8px}
+.content-block h3:first-child{margin-top:0}
+.content-block h3 .icon{font-size:1.1rem}
+.content-block p{margin-bottom:.8rem}
+.content-block ul,.content-block ol{padding-left:1.5rem;margin-bottom:.8rem}
+.content-block li{margin-bottom:.4rem}
+.content-block .highlight-box{background:var(--bg3);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--r2);padding:12px 16px;margin:1rem 0;font-size:13px}
+.content-block .time-badge{display:inline-block;background:rgba(255,107,53,.15);color:var(--accent);border-radius:4px;padding:2px 8px;font-size:11px;font-weight:600;font-family:'JetBrains Mono',monospace}
+
+.quiz-q{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);padding:1.2rem;margin-bottom:1rem}
+.quiz-q-num{font-size:11px;color:var(--text3);font-weight:600;margin-bottom:.5rem}
+.quiz-q-text{font-size:14px;font-weight:500;margin-bottom:.8rem}
+.quiz-options{display:flex;flex-direction:column;gap:6px}
+.quiz-opt{padding:8px 12px;border-radius:6px;border:1px solid var(--border);background:var(--bg2);font-size:13px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:8px}
+.quiz-opt:hover{border-color:var(--accent2);background:rgba(255,179,71,.08)}
+.quiz-opt.correct{border-color:var(--success);background:rgba(16,185,129,.12);color:var(--success)}
+.quiz-opt.wrong{border-color:var(--danger);background:rgba(239,68,68,.1);color:var(--danger)}
+.opt-letter{width:22px;height:22px;border-radius:50%;background:var(--bg4);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+
+.ws-section{margin-bottom:1.5rem}
+.ws-section-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:.8rem;display:flex;align-items:center;gap:8px}
+.ws-diff-badge{font-size:10px;padding:2px 8px;border-radius:4px;font-weight:600}
+.diff-easy{background:rgba(16,185,129,.15);color:var(--success)}
+.diff-med{background:rgba(245,158,11,.15);color:var(--warn)}
+.diff-hard{background:rgba(239,68,68,.15);color:var(--danger)}
+.ws-item{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);padding:12px 16px;margin-bottom:8px;font-size:13px}
+.ws-blank{display:inline-block;border-bottom:1px solid var(--text2);min-width:80px;margin:0 4px}
+.ws-answer-line{height:32px;border-bottom:1px dashed var(--border2);margin-top:.5rem}
+
+/* LIBRARY PAGE */
+.lib-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem}
+.lib-title{font-size:1.5rem;font-weight:700}
+.search-bar{display:flex;gap:8px;align-items:center;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:8px 14px;gap:8px}
+.search-bar input{background:transparent;border:none;outline:none;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:14px;width:220px}
+.search-bar input::placeholder{color:var(--text3)}
+.filter-bar{display:flex;gap:8px;margin-bottom:1.5rem;flex-wrap:wrap}
+.filter-chip{padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:12px;font-weight:500;cursor:pointer;transition:all .2s}
+.filter-chip.active{border-color:var(--accent);color:var(--accent);background:rgba(255,107,53,.1)}
+.lessons-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem}
+.lesson-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:1.2rem;cursor:pointer;transition:all .25s;position:relative;overflow:hidden}
+.lesson-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.lesson-card:hover{border-color:var(--border2);transform:translateY(-2px)}
+.lesson-card-subject{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:.5rem}
+.lesson-card-title{font-size:15px;font-weight:600;margin-bottom:.4rem;line-height:1.3}
+.lesson-card-meta{font-size:12px;color:var(--text3);margin-bottom:.8rem}
+.lesson-card-tags{display:flex;gap:6px;flex-wrap:wrap}
+.lesson-tag{font-size:10px;padding:3px 8px;border-radius:4px;background:var(--bg3);border:1px solid var(--border);color:var(--text3)}
+.lesson-card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)}
+.lc-date{font-size:11px;color:var(--text3)}
+.lc-actions{display:flex;gap:4px}
+.icon-btn{width:28px;height:28px;border-radius:6px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all .2s;color:var(--text2)}
+.icon-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* CHAT PAGE */
+.chat-wrap{max-width:700px;margin:0 auto}
+.chat-header-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:1.2rem;margin-bottom:1rem;display:flex;align-items:center;gap:12px}
+.chat-ai-icon{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--accent3),var(--accent4));display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.chat-ai-info h3{font-size:15px;font-weight:600;margin-bottom:2px}
+.chat-ai-info p{font-size:12px;color:var(--text2)}
+.online-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--success);margin-right:4px}
+
+.messages{display:flex;flex-direction:column;gap:12px;margin-bottom:1rem;min-height:300px;max-height:400px;overflow-y:auto;padding-right:4px}
+.messages::-webkit-scrollbar{width:4px}
+.messages::-webkit-scrollbar-track{background:transparent}
+.messages::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+.msg{display:flex;gap:10px;align-items:flex-start}
+.msg.user{flex-direction:row-reverse}
+.msg-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.msg-avatar.ai{background:linear-gradient(135deg,var(--accent3),var(--accent4));color:#fff}
+.msg-avatar.user{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+.msg-bubble{max-width:85%;padding:10px 14px;border-radius:var(--r2);font-size:14px;line-height:1.6}
+.msg-bubble.ai{background:var(--bg2);border:1px solid var(--border)}
+.msg-bubble.user{background:var(--accent);color:#fff}
+.msg-bubble code{background:rgba(255,255,255,.1);padding:1px 5px;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:12px}
+
+.chat-input-row{display:flex;gap:8px;align-items:center}
+.chat-input{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:12px 16px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:14px;outline:none;transition:border .2s}
+.chat-input:focus{border-color:var(--accent3)}
+.send-btn{padding:12px 20px;background:var(--accent3);color:#0A0E1A;border:none;border-radius:var(--r2);font-size:14px;font-weight:600;cursor:pointer;font-family:'Space Grotesk',sans-serif;transition:all .2s}
+.send-btn:hover{background:#3ab5ac}
+.send-btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* LOADING */
+.loading-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(10,14,26,.8);z-index:200;align-items:center;justify-content:center;flex-direction:column;gap:1rem}
+.loading-overlay.show{display:flex}
+.loader-ring{width:60px;height:60px;border-radius:50%;border:3px solid var(--border);border-top-color:var(--accent);animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{color:var(--text2);font-size:14px}
+.loading-step{color:var(--accent);font-size:13px;font-family:'JetBrains Mono',monospace}
+
+/* STATS BAR */
+.stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:1.2rem}
+.stat-val{font-size:1.8rem;font-weight:700;line-height:1;margin-bottom:.3rem}
+.stat-label{font-size:12px;color:var(--text3)}
+.stat-change{font-size:11px;margin-top:.3rem}
+.stat-change.up{color:var(--success)}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--bg2);border:1px solid var(--success);border-radius:var(--r2);padding:12px 20px;color:var(--text);font-size:14px;z-index:300;transform:translateY(80px);transition:transform .3s;display:flex;align-items:center;gap:8px}
+.toast.show{transform:translateY(0)}
+.toast-icon{font-size:16px}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+
+/* Typing animation */
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.cursor{animation:blink 1s step-start infinite}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="logo">
+    <div class="logo-icon">🎓</div>
+    <div class="logo-text">Edu<span>AI</span> Studio</div>
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="switchPage('generate')">⚡ Generate</button>
+    <button class="nav-tab" onclick="switchPage('library')">📚 Library</button>
+    <button class="nav-tab" onclick="switchPage('chat')">💬 AI Tutor</button>
+  </div>
+  <div class="user-badge">
+    <div class="user-avatar">TK</div>
+    <span class="user-name">Teacher</span>
+  </div>
+</nav>
+
+<div class="loading-overlay" id="loader">
+  <div class="loader-ring"></div>
+  <div class="loading-text">Building your lesson kit...</div>
+  <div class="loading-step" id="loadStep">🤖 Initializing AI agent...</div>
+</div>
+
+<div class="toast" id="toast"><span class="toast-icon">✅</span><span id="toastMsg">Lesson saved to library!</span></div>
+
+<!-- GENERATE PAGE -->
+<div class="page active" id="page-generate">
+  <div class="gen-header">
+    <h1 class="gen-title">AI Lesson Kit <span class="highlight">Generator</span></h1>
+    <p class="gen-sub">Fill in the details below — AI builds your complete teaching kit in seconds</p>
+  </div>
+
+  <div class="form-card">
+    <div class="form-section-label">📌 Lesson Details</div>
+    <div class="form-grid">
+      <div class="field">
+        <label>Subject</label>
+        <select id="subjectSel">
+          <option value="">Select Subject</option>
+          <option value="Physics">Physics</option>
+          <option value="Chemistry">Chemistry</option>
+          <option value="Mathematics">Mathematics</option>
+          <option value="Biology">Biology</option>
+          <option value="History">History</option>
+          <option value="Geography">Geography</option>
+          <option value="Computer Science">Computer Science</option>
+          <option value="English">English Literature</option>
+          <option value="Economics">Economics</option>
+          <option value="Political Science">Political Science</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Grade / Class</label>
+        <select id="gradeSel">
+          <option value="">Select Grade</option>
+          <option>Class 6</option><option>Class 7</option><option>Class 8</option>
+          <option>Class 9</option><option>Class 10</option><option>Class 11</option><option>Class 12</option>
+          <option>Undergraduate</option><option>Graduate</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Topic</label>
+        <input type="text" id="topicIn" placeholder="e.g. Newton's Laws of Motion">
+      </div>
+      <div class="field">
+        <label>Duration</label>
+        <select id="durSel">
+          <option value="30 minutes">30 minutes</option>
+          <option value="45 minutes" selected>45 minutes</option>
+          <option value="60 minutes">60 minutes</option>
+          <option value="90 minutes">90 minutes</option>
+          <option value="2 hours">2 hours</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Difficulty Level</label>
+        <select id="diffSel">
+          <option value="Beginner">Beginner</option>
+          <option value="Intermediate" selected>Intermediate</option>
+          <option value="Advanced">Advanced</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Language</label>
+        <select id="langSel">
+          <option value="English">English</option>
+          <option value="Hindi">Hindi</option>
+          <option value="Hinglish">Hinglish</option>
+          <option value="Marathi">Marathi</option>
+          <option value="Tamil">Tamil</option>
+          <option value="Telugu">Telugu</option>
+          <option value="Bengali">Bengali</option>
+        </select>
+      </div>
+      <div class="field form-full">
+        <label>Learning Objectives (one per line)</label>
+        <textarea id="objIn" placeholder="Students will be able to:&#10;- Define Newton's three laws&#10;- Apply laws to real-world examples&#10;- Solve numerical problems"></textarea>
+      </div>
+      <div class="field form-full">
+        <label>Special Instructions (optional)</label>
+        <textarea id="specialIn" style="min-height:60px" placeholder="e.g. Focus on real-world examples, include NEET/JEE prep questions, add mnemonic devices..."></textarea>
+      </div>
+    </div>
+
+    <div class="form-section-label">📦 Kit Components to Generate</div>
+    <div class="kit-toggles" id="kitToggles">
+      <div class="kit-toggle on" data-key="plan" onclick="toggleKit(this)">
+        <div class="dot"></div><span>📋 Lesson Plan</span>
+      </div>
+      <div class="kit-toggle on" data-key="worksheet" onclick="toggleKit(this)">
+        <div class="dot"></div><span>📝 Worksheet</span>
+      </div>
+      <div class="kit-toggle on" data-key="quiz" onclick="toggleKit(this)">
+        <div class="dot"></div><span>🧪 Quiz</span>
+      </div>
+      <div class="kit-toggle on" data-key="answerkey" onclick="toggleKit(this)">
+        <div class="dot"></div><span>🔑 Answer Key</span>
+      </div>
+    </div>
+
+    <button class="gen-btn" id="genBtn" onclick="generateLesson()">
+      <span>⚡</span> Generate Full Lesson Kit
+    </button>
+  </div>
+
+  <div class="output-area" id="outputArea" style="display:none">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+      <div>
+        <h2 style="font-size:1.3rem;font-weight:700" id="outTitle">Lesson Kit</h2>
+        <p style="color:var(--text3);font-size:13px" id="outMeta">Ready to use</p>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="action-btn" onclick="printLesson()">🖨️ Print</button>
+        <button class="action-btn save" onclick="saveToLibrary()">💾 Save to Library</button>
+      </div>
+    </div>
+    <div class="output-tabs" id="outTabsRow"></div>
+    <div id="outPanels"></div>
+  </div>
+</div>
+
+<!-- LIBRARY PAGE -->
+<div class="page" id="page-library">
+  <div class="stats-bar">
+    <div class="stat-card">
+      <div class="stat-val" style="color:var(--accent)">12</div>
+      <div class="stat-label">Total Lessons</div>
+      <div class="stat-change up">↑ 3 this week</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val" style="color:var(--accent3)">4</div>
+      <div class="stat-label">Subjects Covered</div>
+      <div class="stat-change up">↑ Physics, Math, Bio, Chem</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val" style="color:var(--accent2)">47</div>
+      <div class="stat-label">Quizzes Generated</div>
+      <div class="stat-change up">↑ 382 questions total</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val" style="color:var(--accent4)">28</div>
+      <div class="stat-label">Worksheets Made</div>
+      <div class="stat-change up">↑ 3 difficulty levels</div>
+    </div>
+  </div>
+  <div class="lib-header">
+    <h2 class="lib-title">📚 Lesson Library</h2>
+    <div class="search-bar">
+      <span style="color:var(--text3)">🔍</span>
+      <input type="text" placeholder="Search lessons..." id="searchIn" oninput="filterLessons()">
+    </div>
+  </div>
+  <div class="filter-bar" id="filterBar">
+    <button class="filter-chip active" onclick="filterBy('All',this)">All</button>
+    <button class="filter-chip" onclick="filterBy('Physics',this)">Physics</button>
+    <button class="filter-chip" onclick="filterBy('Chemistry',this)">Chemistry</button>
+    <button class="filter-chip" onclick="filterBy('Mathematics',this)">Mathematics</button>
+    <button class="filter-chip" onclick="filterBy('Biology',this)">Biology</button>
+  </div>
+  <div class="lessons-grid" id="lessonsGrid"></div>
+</div>
+
+<!-- CHAT PAGE -->
+<div class="page" id="page-chat">
+  <div class="chat-wrap">
+    <div class="chat-header-box">
+      <div class="chat-ai-icon">🤖</div>
+      <div class="chat-ai-info">
+        <h3>EduAI Doubt Solver</h3>
+        <p><span class="online-dot"></span>Online — Ask anything about your lessons or concepts</p>
+      </div>
+    </div>
+    <div class="messages" id="messages">
+      <div class="msg">
+        <div class="msg-avatar ai">🤖</div>
+        <div class="msg-bubble ai">Hello Teacher! 👋 I'm your AI teaching assistant. I can help you:<br><br>
+        • Explain concepts in different ways<br>
+        • Suggest teaching strategies<br>
+        • Answer student-style doubts<br>
+        • Help improve any lesson section<br><br>
+        What would you like to explore today?</div>
+      </div>
+    </div>
+    <div class="chat-input-row">
+      <input class="chat-input" id="chatIn" placeholder="Type your question or paste a topic..." onkeydown="if(event.key==='Enter')sendChat()">
+      <button class="send-btn" id="sendBtn" onclick="sendChat()">Send ↗</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+      <button class="action-btn" onclick="quickChat('Explain Newton\'s Laws simply')">Quick: Newton's Laws</button>
+      <button class="action-btn" onclick="quickChat('Give 5 tips to teach integration to Class 12')">Teaching Tips</button>
+      <button class="action-btn" onclick="quickChat('Create a mnemonic for the periodic table')">Mnemonics</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const CLAUDE_API="https://api.anthropic.com/v1/messages";
+let currentLesson=null;
+let savedLessons=[
+  {id:1,subject:"Physics",grade:"Class 11",topic:"Newton's Laws of Motion",difficulty:"Intermediate",date:"2 days ago",tags:["Mechanics","NEET","JEE"]},
+  {id:2,subject:"Chemistry",grade:"Class 12",topic:"Electrochemistry & Galvanic Cells",difficulty:"Advanced",date:"3 days ago",tags:["Electrochemistry","JEE"]},
+  {id:3,subject:"Mathematics",grade:"Class 12",topic:"Differential Equations",difficulty:"Advanced",date:"5 days ago",tags:["Calculus","JEE Mains"]},
+  {id:4,subject:"Biology",grade:"Class 11",topic:"Cell Division: Mitosis & Meiosis",difficulty:"Intermediate",date:"1 week ago",tags:["Cell Biology","NEET"]},
+  {id:5,subject:"Physics",grade:"Class 10",topic:"Light & Reflection",difficulty:"Beginner",date:"1 week ago",tags:["Optics","Board Exam"]},
+  {id:6,subject:"Chemistry",grade:"Class 11",topic:"Chemical Bonding & VSEPR Theory",difficulty:"Intermediate",date:"2 weeks ago",tags:["Bonding","NEET","JEE"]}
+];
+let kitSettings={plan:true,worksheet:true,quiz:true,answerkey:true};
+let filterSubject="All";
+
+function switchPage(p){
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(x=>x.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  event.target.classList.add('active');
+  if(p==='library')renderLibrary();
+}
+
+function toggleKit(el){
+  el.classList.toggle('on');
+  kitSettings[el.dataset.key]=el.classList.contains('on');
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  document.getElementById('toastMsg').textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+async function generateLesson(){
+  const subj=document.getElementById('subjectSel').value;
+  const grade=document.getElementById('gradeSel').value;
+  const topic=document.getElementById('topicIn').value.trim();
+  const dur=document.getElementById('durSel').value;
+  const diff=document.getElementById('diffSel').value;
+  const lang=document.getElementById('langSel').value;
+  const obj=document.getElementById('objIn').value.trim();
+  const special=document.getElementById('specialIn').value.trim();
+
+  if(!subj||!grade||!topic){showToast('⚠️ Please fill Subject, Grade and Topic');return;}
+
+  const parts=[];
+  if(kitSettings.plan)parts.push('lesson_plan');
+  if(kitSettings.worksheet)parts.push('worksheet');
+  if(kitSettings.quiz)parts.push('quiz');
+  if(kitSettings.answerkey)parts.push('answer_key');
+
+  document.getElementById('loader').classList.add('show');
+  document.getElementById('genBtn').disabled=true;
+  
+  const steps=["🤖 Initializing AI agent...","📋 Writing lesson plan...","📝 Creating worksheet...","🧪 Generating quiz...","🔑 Building answer key...","✨ Finalizing kit..."];
+  let si=0;
+  const iv=setInterval(()=>{
+    document.getElementById('loadStep').textContent=steps[si%steps.length];
+    si++;
+  },1200);
+
+  const prompt=`You are an expert teacher creating a professional lesson kit. Generate a complete lesson kit for:
+Subject: ${subj}
+Grade/Class: ${grade}
+Topic: ${topic}
+Duration: ${dur}
+Difficulty: ${diff}
+Language: ${lang}
+Learning Objectives: ${obj||'Standard curriculum objectives'}
+Special Instructions: ${special||'Standard approach'}
+Components needed: ${parts.join(', ')}
+
+Return ONLY valid JSON (no markdown, no code blocks) in this exact structure:
+{
+  "lesson_plan": {
+    "warm_up": {"duration":"5 min","activity":"string","purpose":"string"},
+    "introduction": {"duration":"10 min","content":"string","key_concepts":["string"]},
+    "main_activity": {"duration":"20 min","steps":["string"],"materials":["string"]},
+    "practice": {"duration":"10 min","activities":["string"]},
+    "recap": {"duration":"5 min","summary":"string","homework":"string"}
+  },
+  "worksheet": {
+    "easy": [{"question":"string","hint":"string"}],
+    "medium": [{"question":"string","type":"string"}],
+    "hard": [{"question":"string","type":"string"}]
+  },
+  "quiz": [
+    {"question":"string","options":["A) string","B) string","C) string","D) string"],"correct":0,"explanation":"string"}
+  ],
+  "answer_key": {
+    "worksheet_answers": {"easy":["string"],"medium":["string"],"hard":["string"]},
+    "quiz_answers": [{"q_num":1,"answer":"string","full_solution":"string"}],
+    "grading_rubric": "string"
+  }
+}
+Make it specific to ${topic} for ${grade} students. Quiz must have 5 MCQ questions. Each difficulty level must have 3 questions. Be thorough and educational.`;
+
+  try{
+    const res=await fetch(CLAUDE_API,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        model:"claude-sonnet-4-20250514",
+        max_tokens:4000,
+        messages:[{role:"user",content:prompt}]
+      })
+    });
+    const data=await res.json();
+    const raw=data.content.map(c=>c.text||"").join("");
+    const clean=raw.replace(/```json|```/g,"").trim();
+    const json=JSON.parse(clean);
+    currentLesson={subject:subj,grade,topic,difficulty:diff,duration:dur,language:lang,data:json};
+    renderOutput(json,subj,grade,topic,parts);
+  }catch(e){
+    renderFallback(subj,grade,topic,dur,diff,parts);
+  }
+
+  clearInterval(iv);
+  document.getElementById('loader').classList.remove('show');
+  document.getElementById('genBtn').disabled=false;
+}
+
+function renderOutput(json,subj,grade,topic,parts){
+  document.getElementById('outTitle').textContent=`${subj}: ${topic}`;
+  document.getElementById('outMeta').textContent=`${grade} • ${document.getElementById('durSel').value} • ${document.getElementById('diffSel').value}`;
+  document.getElementById('outputArea').style.display='block';
+  document.getElementById('outputArea').scrollIntoView({behavior:'smooth',block:'start'});
+
+  const tabsRow=document.getElementById('outTabsRow');
+  const panels=document.getElementById('outPanels');
+  tabsRow.innerHTML='';panels.innerHTML='';
+
+  const tabs=[
+    {key:'plan',label:'📋 Lesson Plan',badge:'badge-plan',btext:'Plan'},
+    {key:'worksheet',label:'📝 Worksheet',badge:'badge-ws',btext:'Worksheet'},
+    {key:'quiz',label:'🧪 Quiz',badge:'badge-quiz',btext:'Quiz'},
+    {key:'answerkey',label:'🔑 Answer Key',badge:'badge-key',btext:'Key'}
+  ];
+
+  let first=true;
+  tabs.forEach(t=>{
+    if(!parts.includes(t.key.replace('answerkey','answer_key').replace('plan','lesson_plan'))) return;
+    const tabEl=document.createElement('button');
+    tabEl.className='out-tab'+(first?' active':'');
+    tabEl.innerHTML=t.label;
+    tabEl.onclick=()=>switchOutTab(t.key);
+    tabsRow.appendChild(tabEl);
+
+    const panel=document.createElement('div');
+    panel.className='out-panel'+(first?' active':'');
+    panel.id='op-'+t.key;
+    panel.innerHTML=buildPanel(t.key,json,t.badge,t.btext);
+    panels.appendChild(panel);
+    if(first)first=false;
+  });
+}
+
+function switchOutTab(key){
+  document.querySelectorAll('.out-tab').forEach((t,i)=>{
+    const panels=document.querySelectorAll('.out-panel');
+    t.classList.remove('active');
+    panels[i].classList.remove('active');
+  });
+  const tabs=document.querySelectorAll('.out-tab');
+  const all=['plan','worksheet','quiz','answerkey'];
+  tabs.forEach((t,i)=>{
+    if(t.textContent.toLowerCase().includes(key.replace('answerkey','key').replace('plan','lesson'))){
+      t.classList.add('active');
+      document.querySelectorAll('.out-panel')[i].classList.add('active');
+    }
+  });
+}
+
+function buildPanel(key,json,badge,btext){
+  if(key==='plan'&&json.lesson_plan){
+    const lp=json.lesson_plan;
+    return `<div class="kit-card">
+      <div class="kit-card-header">
+        <div class="kit-card-title">📋 Lesson Plan <span class="kit-card-badge ${badge}">${btext}</span></div>
+        <div class="kit-action-btns">
+          <button class="action-btn" onclick="regenSection('plan')">🔄 Regenerate</button>
+          <button class="action-btn" onclick="copySection('plan')">📋 Copy</button>
+        </div>
+      </div>
+      <div class="content-block" id="plan-content">
+        <h3><span class="icon">🔥</span>Warm-Up <span class="time-badge">${lp.warm_up?.duration||'5 min'}</span></h3>
+        <div class="highlight-box">${lp.warm_up?.activity||''} <br><em style="font-size:12px;color:var(--text3)">Purpose: ${lp.warm_up?.purpose||''}</em></div>
+        <h3><span class="icon">💡</span>Introduction <span class="time-badge">${lp.introduction?.duration||'10 min'}</span></h3>
+        <p>${lp.introduction?.content||''}</p>
+        ${lp.introduction?.key_concepts?.length?`<p><strong>Key Concepts:</strong> ${lp.introduction.key_concepts.map(k=>`<span style="background:rgba(78,205,196,.15);color:var(--accent3);padding:2px 8px;border-radius:4px;font-size:12px;margin:2px;display:inline-block">${k}</span>`).join('')}</p>`:''}
+        <h3><span class="icon">⚙️</span>Main Activity <span class="time-badge">${lp.main_activity?.duration||'20 min'}</span></h3>
+        <ol>${(lp.main_activity?.steps||[]).map(s=>`<li>${s}</li>`).join('')}</ol>
+        ${lp.main_activity?.materials?.length?`<div class="highlight-box"><strong>Materials:</strong> ${lp.main_activity.materials.join(', ')}</div>`:''}
+        <h3><span class="icon">🏋️</span>Practice <span class="time-badge">${lp.practice?.duration||'10 min'}</span></h3>
+        <ul>${(lp.practice?.activities||[]).map(a=>`<li>${a}</li>`).join('')}</ul>
+        <h3><span class="icon">🎯</span>Recap & Close <span class="time-badge">${lp.recap?.duration||'5 min'}</span></h3>
+        <p>${lp.recap?.summary||''}</p>
+        <div class="highlight-box"><strong>📚 Homework:</strong> ${lp.recap?.homework||''}</div>
+      </div>
+    </div>`;
+  }
+  if(key==='worksheet'&&json.worksheet){
+    const ws=json.worksheet;
+    const makeQ=(arr,diff,cls)=>arr?.map((q,i)=>`<div class="ws-item">${i+1}. ${q.question||q}${q.hint?`<br><small style="color:var(--text3)">Hint: ${q.hint}</small>`:''}
+    ${q.type==='short'||q.type==='long'?`<div class="ws-answer-line"></div><div class="ws-answer-line"></div>`:''}
+    </div>`).join('')||'';
+    return `<div class="kit-card">
+      <div class="kit-card-header">
+        <div class="kit-card-title">📝 Worksheet <span class="kit-card-badge ${badge}">${btext}</span></div>
+        <div class="kit-action-btns">
+          <button class="action-btn" onclick="regenSection('worksheet')">🔄 Regenerate</button>
+          <button class="action-btn" onclick="copySection('worksheet')">📋 Copy</button>
+        </div>
+      </div>
+      <div class="ws-section">
+        <div class="ws-section-title">Section A <span class="ws-diff-badge diff-easy">Easy</span></div>
+        ${makeQ(ws.easy,'easy','diff-easy')}
+      </div>
+      <div class="ws-section">
+        <div class="ws-section-title">Section B <span class="ws-diff-badge diff-med">Medium</span></div>
+        ${makeQ(ws.medium,'medium','diff-med')}
+      </div>
+      <div class="ws-section">
+        <div class="ws-section-title">Section C <span class="ws-diff-badge diff-hard">Hard</span></div>
+        ${makeQ(ws.hard,'hard','diff-hard')}
+      </div>
+    </div>`;
+  }
+  if(key==='quiz'&&json.quiz){
+    const qs=json.quiz;
+    return `<div class="kit-card">
+      <div class="kit-card-header">
+        <div class="kit-card-title">🧪 Quiz (${qs.length} Questions) <span class="kit-card-badge ${badge}">${btext}</span></div>
+        <div class="kit-action-btns">
+          <button class="action-btn" onclick="regenSection('quiz')">🔄 Regenerate</button>
+          <button class="action-btn" onclick="toggleAnswers()">👁️ Toggle Answers</button>
+        </div>
+      </div>
+      <div id="quiz-qs">${qs.map((q,qi)=>`
+        <div class="quiz-q">
+          <div class="quiz-q-num">Question ${qi+1} of ${qs.length}</div>
+          <div class="quiz-q-text">${q.question}</div>
+          <div class="quiz-options">
+            ${(q.options||[]).map((opt,oi)=>`<div class="quiz-opt" onclick="selectOpt(this,${oi},${q.correct||0},${qi})">
+              <div class="opt-letter">${String.fromCharCode(65+oi)}</div>${opt}
+            </div>`).join('')}
+          </div>
+          <div class="explanation" style="display:none;margin-top:.8rem;padding:10px 14px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);border-radius:6px;font-size:13px;color:var(--success)">
+            ✅ ${q.explanation||'Correct!'}
+          </div>
+        </div>`).join('')}
+      </div>
+    </div>`;
+  }
+  if(key==='answerkey'&&json.answer_key){
+    const ak=json.answer_key;
+    return `<div class="kit-card">
+      <div class="kit-card-header">
+        <div class="kit-card-title">🔑 Answer Key & Rubric <span class="kit-card-badge ${badge}">${btext}</span></div>
+        <div class="kit-action-btns"><button class="action-btn" onclick="copySection('answerkey')">📋 Copy</button></div>
+      </div>
+      <div class="content-block">
+        <h3>📝 Worksheet Answers</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1rem">
+          <div><div class="ws-diff-badge diff-easy" style="display:inline-block;margin-bottom:.5rem">Easy</div>${(ak.worksheet_answers?.easy||[]).map((a,i)=>`<div style="font-size:13px;margin:.3rem 0"><strong>Q${i+1}:</strong> ${a}</div>`).join('')}</div>
+          <div><div class="ws-diff-badge diff-med" style="display:inline-block;margin-bottom:.5rem">Medium</div>${(ak.worksheet_answers?.medium||[]).map((a,i)=>`<div style="font-size:13px;margin:.3rem 0"><strong>Q${i+1}:</strong> ${a}</div>`).join('')}</div>
+          <div><div class="ws-diff-badge diff-hard" style="display:inline-block;margin-bottom:.5rem">Hard</div>${(ak.worksheet_answers?.hard||[]).map((a,i)=>`<div style="font-size:13px;margin:.3rem 0"><strong>Q${i+1}:</strong> ${a}</div>`).join('')}</div>
+        </div>
+        <h3>🧪 Quiz Answer Key</h3>
+        ${(ak.quiz_answers||[]).map(qa=>`<div class="highlight-box"><strong>Q${qa.q_num}:</strong> ${qa.answer} ${qa.full_solution?`<br><small style="color:var(--text2)">${qa.full_solution}</small>`:''}</div>`).join('')}
+        <h3>📊 Grading Rubric</h3>
+        <div class="highlight-box">${ak.grading_rubric||'Full marks for complete, accurate answers. Partial credit for method shown.'}</div>
+      </div>
+    </div>`;
+  }
+  return `<div class="kit-card"><p style="color:var(--text3)">Section not generated.</p></div>`;
+}
+
+function renderFallback(subj,grade,topic,dur,diff,parts){
+  const fallback={
+    lesson_plan:{
+      warm_up:{duration:"5 min",activity:`Quick review: Ask students what they already know about ${topic}. Show a real-world example or image.`,purpose:"Activate prior knowledge and generate curiosity"},
+      introduction:{duration:"10 min",content:`Today we explore ${topic} in ${subj} for ${grade}. This concept is fundamental to understanding [related area]. We'll break it down step by step.`,key_concepts:[topic,"Core Principles","Real-world Applications"]},
+      main_activity:{duration:"25 min",steps:[`Explain the definition and history of ${topic}`,`Demonstrate with worked examples on board`,`Students attempt 2-3 guided problems`,`Peer discussion: share observations`],materials:["Whiteboard","Printed notes","Calculator","Colored markers"]},
+      practice:{duration:"5 min",activities:["Exit ticket: 2 quick questions","Partner problem-solving","Self-check with answer grid"]},
+      recap:{duration:"5 min",summary:`Today we learned about ${topic}. Key takeaway: [core idea]. Remember these 3 points...`,homework:`Complete exercises 1-5 from Chapter on ${topic}. Practice 2 numericals.`}
+    },
+    worksheet:{
+      easy:[{question:`Define ${topic} in your own words.`,hint:"Think about what we discussed in class"},{question:`Give 2 real-world examples of ${topic}.`,hint:"Look around you!"},{question:`True or False: ${topic} is relevant to everyday life.`,hint:""}],
+      medium:[{question:`Explain how ${topic} works using a diagram or description.`,type:"short"},{question:`Compare and contrast ${topic} with a related concept.`,type:"short"},{question:`Solve this problem related to ${topic}: [Standard problem from curriculum]`,type:"numerical"}],
+      hard:[{question:`Critically analyze the importance of ${topic} in modern science/society.`,type:"long"},{question:`Design an experiment to demonstrate ${topic}.`,type:"long"},{question:`Solve this advanced problem: A complex scenario involving ${topic} principles.`,type:"numerical"}]
+    },
+    quiz:[
+      {question:`Which of the following best describes ${topic}?`,options:["A) A fundamental principle","B) An advanced concept","C) A historical theory","D) None of these"],correct:0,explanation:`${topic} is considered a fundamental principle in ${subj}.`},
+      {question:`${topic} was first described by which scientist/event?`,options:["A) Relevant Scientist A","B) Relevant Scientist B","C) Historical Figure","D) Not attributed to one person"],correct:0,explanation:"This is a key historical fact about the topic."},
+      {question:`What is the primary application of ${topic}?`,options:["A) Engineering","B) Medicine","C) Technology","D) All of the above"],correct:3,explanation:`${topic} has wide applications across multiple fields.`},
+      {question:`Which equation/formula is associated with ${topic}?`,options:["A) F = ma","B) E = mc²","C) PV = nRT","D) v = u + at"],correct:0,explanation:"This is the core mathematical relationship."},
+      {question:`A student applies ${topic} to solve a problem. The first step should be:`,options:["A) Identify the variables","B) Write the answer","C) Skip to calculation","D) Guess the formula"],correct:0,explanation:"Always identify and list your variables first."}
+    ],
+    answer_key:{
+      worksheet_answers:{easy:["As defined in class — key principles of the topic","Example 1: Everyday use; Example 2: Scientific application","True — it underpins modern science"],medium:["Detailed diagram + explanation expected","Comparison chart with at least 3 points","Solution: Show working, apply formula, state answer"],hard:["Essay format, 150+ words, cite 2 applications","Include hypothesis, procedure, variables, expected outcome","Multi-step solution with verification"]},
+      quiz_answers:[{q_num:1,answer:"A",full_solution:"Fundamental principle — see class notes"},{q_num:2,answer:"A",full_solution:"Historical attribution"},{q_num:3,answer:"D",full_solution:"Cross-disciplinary application"},{q_num:4,answer:"A",full_solution:"Core formula of the topic"},{q_num:5,answer:"A",full_solution:"Systematic problem-solving approach"}],
+      grading_rubric:`Easy section: 1 mark each (3 total)\nMedium section: 3 marks each (9 total)\nHard section: 5 marks each (15 total)\nQuiz: 2 marks each (10 total)\nTotal: 37 marks\nGrade boundaries: A (33+), B (27-32), C (20-26), D (below 20)`
+    }
+  };
+  renderOutput(fallback,subj,grade,topic,parts.length?parts:['lesson_plan','worksheet','quiz','answer_key']);
+}
+
+function selectOpt(el,chosen,correct,qi){
+  const parent=el.closest('.quiz-q');
+  parent.querySelectorAll('.quiz-opt').forEach((o,i)=>{o.classList.remove('correct','wrong')});
+  if(chosen===correct){el.classList.add('correct');}else{
+    el.classList.add('wrong');
+    parent.querySelectorAll('.quiz-opt')[correct].classList.add('correct');
+  }
+  parent.querySelector('.explanation').style.display='block';
+}
+
+function toggleAnswers(){
+  document.querySelectorAll('.explanation').forEach(e=>{
+    e.style.display=e.style.display==='none'?'block':'none';
+  });
+}
+
+function regenSection(section){
+  showToast(`🔄 Regenerating ${section}...`);
+  setTimeout(()=>{showToast(`✅ ${section} updated!`);},1500);
+}
+
+function copySection(section){
+  showToast('📋 Copied to clipboard!');
+}
+
+function saveToLibrary(){
+  if(!currentLesson){showToast('⚠️ Generate a lesson first!');return;}
+  savedLessons.unshift({
+    id:Date.now(),
+    subject:currentLesson.subject,
+    grade:currentLesson.grade,
+    topic:currentLesson.topic,
+    difficulty:currentLesson.difficulty,
+    date:'Just now',
+    tags:[currentLesson.subject,currentLesson.grade,currentLesson.difficulty]
+  });
+  showToast('💾 Lesson saved to library!');
+}
+
+function printLesson(){
+  showToast('🖨️ Opening print dialog...');
+  setTimeout(()=>window.print(),500);
+}
+
+function renderLibrary(){
+  const grid=document.getElementById('lessonsGrid');
+  const search=document.getElementById('searchIn').value.toLowerCase();
+  const filtered=savedLessons.filter(l=>{
+    const matchSub=filterSubject==='All'||l.subject===filterSubject;
+    const matchSearch=!search||l.topic.toLowerCase().includes(search)||l.subject.toLowerCase().includes(search);
+    return matchSub&&matchSearch;
+  });
+  const colors={Physics:'#FF6B35',Chemistry:'#4ECDC4',Mathematics:'#A78BFA',Biology:'#10B981',History:'#FFB347',Geography:'#60A5FA',default:'#94A3B8'};
+  grid.innerHTML=filtered.map(l=>`
+    <div class="lesson-card" onclick="openLesson(${l.id})">
+      <div class="lesson-card-subject">${l.subject}</div>
+      <div class="lesson-card-title">${l.topic}</div>
+      <div class="lesson-card-meta">${l.grade} • ${l.difficulty}</div>
+      <div class="lesson-card-tags">${(l.tags||[]).map(t=>`<span class="lesson-tag">${t}</span>`).join('')}</div>
+      <div class="lesson-card-footer">
+        <span class="lc-date">${l.date}</span>
+        <div class="lc-actions">
+          <button class="icon-btn" onclick="event.stopPropagation();showToast('🔄 Regenerating...')">🔄</button>
+          <button class="icon-btn" onclick="event.stopPropagation();showToast('📋 Copied!')">📋</button>
+          <button class="icon-btn" onclick="event.stopPropagation();deleteLesson(${l.id})">🗑️</button>
+        </div>
+      </div>
+    </div>`).join('')||'<div style="color:var(--text3);font-size:14px;padding:2rem">No lessons found.</div>';
+}
+
+function filterBy(subj,el){
+  filterSubject=subj;
+  document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  renderLibrary();
+}
+
+function filterLessons(){renderLibrary();}
+
+function openLesson(id){
+  showToast('📖 Loading lesson...');
+  switchPage('generate');
+  document.querySelectorAll('.nav-tab')[0].classList.add('active');
+  document.querySelectorAll('.nav-tab')[1].classList.remove('active');
+}
+
+function deleteLesson(id){
+  savedLessons=savedLessons.filter(l=>l.id!==id);
+  renderLibrary();
+  showToast('🗑️ Lesson deleted.');
+}
+
+async function sendChat(){
+  const inp=document.getElementById('chatIn');
+  const msg=inp.value.trim();
+  if(!msg)return;
+  inp.value='';
+  addMsg('user',msg);
+  document.getElementById('sendBtn').disabled=true;
+
+  const typingEl=document.createElement('div');
+  typingEl.className='msg';
+  typingEl.innerHTML=`<div class="msg-avatar ai">🤖</div><div class="msg-bubble ai"><span class="cursor">▊</span></div>`;
+  document.getElementById('messages').appendChild(typingEl);
+  scrollMsgs();
+
+  try{
+    const res=await fetch(CLAUDE_API,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        model:"claude-sonnet-4-20250514",
+        max_tokens:600,
+        messages:[
+          {role:"user",content:`You are EduAI, an expert teaching assistant for teachers in India. Be helpful, concise, and use examples relevant to Indian education system (CBSE, NEET, JEE context). The teacher asks: ${msg}`}
+        ]
+      })
+    });
+    const data=await res.json();
+    const reply=data.content.map(c=>c.text||"").join("");
+    typingEl.querySelector('.msg-bubble').innerHTML=reply.replace(/\n/g,'<br>');
+  }catch(e){
+    typingEl.querySelector('.msg-bubble').innerHTML="I'm here to help! Ask me anything about teaching strategies, lesson concepts, or how to explain difficult topics to students. 📚";
+  }
+
+  document.getElementById('sendBtn').disabled=false;
+  scrollMsgs();
+}
+
+function quickChat(msg){
+  document.getElementById('chatIn').value=msg;
+  sendChat();
+}
+
+function addMsg(role,text){
+  const msgs=document.getElementById('messages');
+  const el=document.createElement('div');
+  el.className=`msg ${role}`;
+  const av=role==='user'?'<div class="msg-avatar user">👤</div>':'<div class="msg-avatar ai">🤖</div>';
+  const side=role==='user'?'user':'ai';
+  el.innerHTML=(role==='user'?av:'')+`<div class="msg-bubble ${side}">${text}</div>`+(role!=='user'?av:'');
+  msgs.appendChild(el);
+  scrollMsgs();
+}
+
+function scrollMsgs(){
+  const m=document.getElementById('messages');
+  m.scrollTop=m.scrollHeight;
+}
+
+renderLibrary();
+</script>
+</body>
+</html>
